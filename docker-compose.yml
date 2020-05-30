@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  mongodb:
+    image: mongo
+    container_name: google-address-mongodb
+    ports:
+    - 27017:27017
+    networks:
+      - google-address-net
+
+networks:
+  google-address-net:
+    driver: bridge
