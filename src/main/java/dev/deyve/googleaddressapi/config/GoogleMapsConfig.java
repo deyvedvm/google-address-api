@@ -11,7 +11,7 @@ public class GoogleMapsConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleMapsConfig.class);
 
-    private final String apiKey = "AIzaSyBm3xh9oZP1ksMWcMzVaZQevWlrtb8tIgc";
+    private final String apiKey = System.getenv("GOOGLE_API_KEY");
 
     @Bean
     public GeoApiContext getContext() {
