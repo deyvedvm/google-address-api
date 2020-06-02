@@ -46,19 +46,9 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("Get Address - should return all addresses")
+    @DisplayName("GET Address - should return all addresses")
     void WhenRequestGetAddressesShouldReturnAllAddressTest() throws Exception {
-        Address addressMock = Address.builder()
-                .id(ObjectId.get().toString())
-                .streetName("Rua Barão de Tefé")
-                .number("67")
-                .complement("")
-                .neighbourhood("Saúde")
-                .city("Rio de Janeiro")
-                .state("RJ")
-                .country("Brasil")
-                .zipcode("")
-                .build();
+        Address addressMock = buildAddressMock();
 
         List<Address> addressListMock = Collections.singletonList(addressMock);
 
@@ -79,31 +69,41 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("POST Address ; should save address")
+    @DisplayName("POST Address - should save address - return address saved")
     void WhenRequestPostAddressShouldSaveAddressTest() throws Exception {
+        Address address = buildAddress();
+
+        Address addressMock = buildAddressMock();
+
+        when(addressService.saveAddress(any(Address.class))).thenReturn(addressMock);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post(URL)
+                .content(objectMapper.writeValueAsString(address))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        verify(addressService).saveAddress(any(Address.class));
+
+        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        Address addressResult = objectMapper.readValue(contentAsString, new TypeReference<>() {
+        });
+
+        assertEquals(addressMock, addressResult, "Incorrect Response content");
+        assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+    }
+
+    @Test
+    @DisplayName("PUT Address - should save address - return address updated ")
+    void WhenRequestPutAddressShouldUpdatedAddressTest() throws Exception {
 
     }
 
     @Test
-    void putAddressTest() {
-    }
-
-    @Test
-    @DisplayName("GET Address by id ; should return one address")
+    @DisplayName("GET Address by id - should return address by id")
     void WhenRequestGetAddressByIdShouldReturnAddressTest() throws Exception {
         String idMock = ObjectId.get().toString();
 
-        Address addressMock = Address.builder()
-                .id(idMock)
-                .streetName("Rua Barão de Tefé")
-                .number("67")
-                .complement("")
-                .neighbourhood("Saúde")
-                .city("Rio de Janeiro")
-                .state("RJ")
-                .country("Brasil")
-                .zipcode("")
-                .build();
+        Address addressMock = buildAddressMock();
 
         when(addressService.findAddressById(idMock)).thenReturn(addressMock);
 
@@ -122,7 +122,7 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("GET Address by id ; should return not found")
+    @DisplayName("GET Address by id - given id that do not exist - should return not found")
     void WhenRequestGetAddressByIdShouldReturnNotFoundTest() throws Exception {
         String idMock = ObjectId.get().toString();
 
@@ -141,21 +141,11 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE Address by id ; should delete address by id")
+    @DisplayName("DELETE Address by id - should delete address by id")
     void WhenRequestDeleteAddressShouldDeleteAddressTest() throws Exception {
         String idMock = ObjectId.get().toString();
 
-        Address addressMock = Address.builder()
-                .id(idMock)
-                .streetName("Rua Barão de Tefé")
-                .number("67")
-                .complement("")
-                .neighbourhood("Saúde")
-                .city("Rio de Janeiro")
-                .state("RJ")
-                .country("Brasil")
-                .zipcode("")
-                .build();
+        Address addressMock = buildAddressMock();
 
         when(addressService.findAddressById(idMock)).thenReturn(addressMock);
 
@@ -171,7 +161,7 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE Address by id ; should return not found")
+    @DisplayName("DELETE Address by id - given id that do not exist - should return not found")
     void WhenRequestDeleteAddressShouldReturnNotFoundTest() throws Exception {
         String idMock = ObjectId.get().toString();
 
@@ -186,5 +176,34 @@ class AddressControllerTest {
         verify(addressService, never()).deleteAddress(idMock);
 
         assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+    }
+
+    private Address buildAddress() {
+        return Address.builder()
+                .streetName("Av. Barão de Tefé")
+                .number("67")
+                .complement("")
+                .neighbourhood("Saúde")
+                .city("Rio de Janeiro")
+                .state("RJ")
+                .country("Brazil")
+                .zipcode("20220-460")
+                .build();
+    }
+
+    private Address buildAddressMock() {
+        return Address.builder()
+                .id(ObjectId.get().toString())
+                .streetName("Av. Barão de Tefé")
+                .number("67")
+                .complement("")
+                .neighbourhood("Saúde")
+                .city("Rio de Janeiro")
+                .state("RJ")
+                .country("Brazil")
+                .zipcode("20220-460")
+                .latitude(-22.8962282)
+                .longitude(-43.1866427)
+                .build();
     }
 }
