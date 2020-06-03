@@ -7,7 +7,8 @@ Given an address it queries the Google API and returns latitude and longitude.
 - [x] Crud
 - [x] Google Service
 - [x] Dockerfile
-- [ ] Tests
+- [x] Unit Tests
+- [ ] Integration Tests
 - [ ] Pagination
 - [ ] Use DTO
 - [ ] Swagger

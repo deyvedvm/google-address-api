@@ -93,9 +93,56 @@ class AddressControllerTest {
     }
 
     @Test
-    @DisplayName("PUT Address - should save address - return address updated ")
+    @DisplayName("PUT Address - should save address - return address updated")
     void WhenRequestPutAddressShouldUpdatedAddressTest() throws Exception {
+        Address address = buildAddress();
+        address.setId(ObjectId.get().toString());
 
+        Address addressMock = buildAddressMock();
+
+        when(addressService.findAddressById(address.getId())).thenReturn(address);
+
+        when(addressService.updateAddress(any(Address.class))).thenReturn(addressMock);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put(URL + "/{id}", address.getId())
+                .content(objectMapper.writeValueAsString(address))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        verify(addressService).findAddressById(any(String.class));
+
+        verify(addressService).updateAddress(any(Address.class));
+
+        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        Address addressResult = objectMapper.readValue(contentAsString, Address.class);
+
+        assertEquals(addressMock, addressResult, "Incorrect Response content");
+        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+    }
+
+    @Test
+    @DisplayName("PUT Address - should try to save address - return not found")
+    void WhenRequestPutAddressShouldReturnNotFoundTest() throws Exception {
+        Address address = buildAddress();
+        address.setId(ObjectId.get().toString());
+
+        when(addressService.findAddressById(address.getId())).thenReturn(null);
+
+        when(addressService.updateAddress(any(Address.class))).thenReturn(any(Address.class));
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put(URL + "/{id}", address.getId())
+                .content(objectMapper.writeValueAsString(address))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        verify(addressService).findAddressById(any(String.class));
+
+        verify(addressService, never()).updateAddress(any(Address.class));
+
+        int contentLength = result.getResponse().getContentLength();
+
+        assertEquals(0, contentLength, "Incorrect Response contentLength");
+        assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus(), "Incorrect Response Status");
     }
 
     @Test
@@ -181,7 +228,7 @@ class AddressControllerTest {
     private Address buildAddress() {
         return Address.builder()
                 .streetName("Av. Barão de Tefé")
-                .number("67")
+                .number("27")
                 .complement("")
                 .neighbourhood("Saúde")
                 .city("Rio de Janeiro")
@@ -195,7 +242,7 @@ class AddressControllerTest {
         return Address.builder()
                 .id(ObjectId.get().toString())
                 .streetName("Av. Barão de Tefé")
-                .number("67")
+                .number("27")
                 .complement("")
                 .neighbourhood("Saúde")
                 .city("Rio de Janeiro")
