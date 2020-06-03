@@ -85,8 +85,7 @@ class AddressControllerTest {
         verify(addressService).saveAddress(any(Address.class));
 
         String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Address addressResult = objectMapper.readValue(contentAsString, new TypeReference<>() {
-        });
+        Address addressResult = objectMapper.readValue(contentAsString, Address.class);
 
         assertEquals(addressMock, addressResult, "Incorrect Response content");
         assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus(), "Incorrect Response Status");
@@ -161,8 +160,7 @@ class AddressControllerTest {
         verify(addressService).findAddressById(idMock);
 
         String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Address address = objectMapper.readValue(contentAsString, new TypeReference<>() {
-        });
+        Address address = objectMapper.readValue(contentAsString, Address.class);
 
         assertEquals(address, addressMock, "Incorrect Response content");
         assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus(), "Incorrect Response Status");
