@@ -1,5 +1,6 @@
 package dev.deyve.googleaddressapi.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.deyve.googleaddressapi.models.Address;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +33,8 @@ class AddressControllerTest {
 
     private final String URL = "http://localhost:8080/api/address";
 
+    Address addressMock;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -42,14 +46,12 @@ class AddressControllerTest {
 
     @BeforeEach
     void setUp() {
-
+        addressMock = buildAddressMock();
     }
 
     @Test
     @DisplayName("GET Address - should return all addresses")
     void WhenRequestGetAddressesShouldReturnAllAddressTest() throws Exception {
-        Address addressMock = buildAddressMock();
-
         List<Address> addressListMock = Collections.singletonList(addressMock);
 
         when(addressService.getAddresses()).thenReturn(addressListMock);
@@ -73,8 +75,6 @@ class AddressControllerTest {
     void WhenRequestPostAddressShouldSaveAddressTest() throws Exception {
         Address address = buildAddress();
 
-        Address addressMock = buildAddressMock();
-
         when(addressService.saveAddress(any(Address.class))).thenReturn(addressMock);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post(URL)
@@ -84,8 +84,7 @@ class AddressControllerTest {
 
         verify(addressService).saveAddress(any(Address.class));
 
-        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Address addressResult = objectMapper.readValue(contentAsString, Address.class);
+        Address addressResult = buildAddressResult(result);
 
         assertEquals(addressMock, addressResult, "Incorrect Response content");
         assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus(), "Incorrect Response Status");
@@ -96,8 +95,6 @@ class AddressControllerTest {
     void WhenRequestPutAddressShouldUpdatedAddressTest() throws Exception {
         Address address = buildAddress();
         address.setId(ObjectId.get().toString());
-
-        Address addressMock = buildAddressMock();
 
         when(addressService.findAddressById(address.getId())).thenReturn(address);
 
@@ -112,8 +109,7 @@ class AddressControllerTest {
 
         verify(addressService).updateAddress(any(Address.class));
 
-        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Address addressResult = objectMapper.readValue(contentAsString, Address.class);
+        Address addressResult = buildAddressResult(result);
 
         assertEquals(addressMock, addressResult, "Incorrect Response content");
         assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus(), "Incorrect Response Status");
@@ -149,8 +145,6 @@ class AddressControllerTest {
     void WhenRequestGetAddressByIdShouldReturnAddressTest() throws Exception {
         String idMock = ObjectId.get().toString();
 
-        Address addressMock = buildAddressMock();
-
         when(addressService.findAddressById(idMock)).thenReturn(addressMock);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", idMock)
@@ -159,8 +153,7 @@ class AddressControllerTest {
 
         verify(addressService).findAddressById(idMock);
 
-        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
-        Address address = objectMapper.readValue(contentAsString, Address.class);
+        Address address = buildAddressResult(result);
 
         assertEquals(address, addressMock, "Incorrect Response content");
         assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus(), "Incorrect Response Status");
@@ -189,8 +182,6 @@ class AddressControllerTest {
     @DisplayName("DELETE Address by id - should delete address by id")
     void WhenRequestDeleteAddressShouldDeleteAddressTest() throws Exception {
         String idMock = ObjectId.get().toString();
-
-        Address addressMock = buildAddressMock();
 
         when(addressService.findAddressById(idMock)).thenReturn(addressMock);
 
@@ -221,6 +212,12 @@ class AddressControllerTest {
         verify(addressService, never()).deleteAddress(idMock);
 
         assertEquals(HttpStatus.NOT_FOUND.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+    }
+
+    private Address buildAddressResult(MvcResult result) throws JsonProcessingException, UnsupportedEncodingException {
+        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        return objectMapper.readValue(contentAsString, Address.class);
     }
 
     private Address buildAddress() {
