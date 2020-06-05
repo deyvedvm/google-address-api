@@ -23,7 +23,9 @@ public class GoogleRestService {
 
     private final GeoApiContext context;
 
-    public Address findLocation(Address address) throws InterruptedException, ApiException, IOException {
+    public LatLng findLocation(Address address) throws InterruptedException, ApiException, IOException {
+        LatLng location = new LatLng(0, 0);
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         StringBuilder addressBuilder = new StringBuilder();
@@ -37,18 +39,16 @@ public class GoogleRestService {
         addressBuilder.append(" ");
         addressBuilder.append(address.getZipcode());
 
-        System.out.println(addressBuilder);
-
-        Address addressWithLocation = gson.fromJson(gson.toJson(address), Address.class);
-
         try {
             GeocodingResult[] results = GeocodingApi.geocode(context, addressBuilder.toString()).await();
 
             logger.info("Location: {}", gson.toJson(results[0].geometry.location));
 
-            LatLng location = results[0].geometry.location;
-            addressWithLocation.setLatitude(location.lat);
-            addressWithLocation.setLongitude(location.lng);
+            location = results[0].geometry.location;
+
+            logger.debug("Location: {}", location);
+
+            return location;
 
         } catch (InterruptedException ie) {
             logger.error("InterruptedException: {}", ie.getMessage());
@@ -58,6 +58,6 @@ public class GoogleRestService {
             logger.error("IOException: {}", ioe.getMessage());
         }
 
-        return addressWithLocation;
+        return location;
     }
 }

@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
+import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddress;
+import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddressMock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -54,13 +56,13 @@ class AddressControllerTest {
     void WhenRequestGetAddressesShouldReturnAllAddressTest() throws Exception {
         List<Address> addressListMock = Collections.singletonList(addressMock);
 
-        when(addressService.getAddresses()).thenReturn(addressListMock);
+        when(addressService.findAddresses()).thenReturn(addressListMock);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(URL)
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        verify(addressService).getAddresses();
+        verify(addressService).findAddresses();
 
         String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
         List<Address> addressList = objectMapper.readValue(contentAsString, new TypeReference<>() {
@@ -218,34 +220,5 @@ class AddressControllerTest {
         String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         return objectMapper.readValue(contentAsString, Address.class);
-    }
-
-    private Address buildAddress() {
-        return Address.builder()
-                .streetName("Av. Barão de Tefé")
-                .number("27")
-                .complement("")
-                .neighbourhood("Saúde")
-                .city("Rio de Janeiro")
-                .state("RJ")
-                .country("Brazil")
-                .zipcode("20220-460")
-                .build();
-    }
-
-    private Address buildAddressMock() {
-        return Address.builder()
-                .id(ObjectId.get().toString())
-                .streetName("Av. Barão de Tefé")
-                .number("27")
-                .complement("")
-                .neighbourhood("Saúde")
-                .city("Rio de Janeiro")
-                .state("RJ")
-                .country("Brazil")
-                .zipcode("20220-460")
-                .latitude(-22.8962282)
-                .longitude(-43.1866427)
-                .build();
     }
 }

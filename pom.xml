@@ -80,13 +80,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Embedded MongoDB -->
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Google Maps Services -->
         <dependency>
             <groupId>com.google.maps</groupId>

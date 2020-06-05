@@ -1,6 +1,7 @@
 package dev.deyve.googleaddressapi.services;
 
 import com.google.maps.errors.ApiException;
+import com.google.maps.model.LatLng;
 import dev.deyve.googleaddressapi.models.Address;
 import dev.deyve.googleaddressapi.repositories.AddressRepository;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,14 @@ public class AddressService {
      *
      * @return List of Addresses
      */
-    public List<Address> getAddresses() {
-        return addressRepository.findAll();
+    public List<Address> findAddresses() {
+        logger.info("Find Addresses...");
+
+        List<Address> addresses = addressRepository.findAll();
+
+        logger.debug("Addresses: {}", addresses);
+
+        return addresses;
     }
 
     /**
@@ -42,23 +49,24 @@ public class AddressService {
      * @return Address saved
      */
     public Address saveAddress(Address address) throws InterruptedException, ApiException, IOException, CloneNotSupportedException {
-        logger.info("Saving address: {}", address);
+        logger.info("Saving address...");
 
         if (Objects.isNull(address.getLatitude()) || Objects.isNull(address.getLongitude())) {
-            Address addressWithCoordinates = googleRestService.findLocation(address);
+            LatLng location = googleRestService.findLocation(address);
+            address.setLatitude(location.lat);
+            address.setLongitude(location.lng);
 
-            logger.info("Saving address with google coordinates: {}", addressWithCoordinates);
+            logger.debug("Saving address with google coordinates: {}", address);
 
-            return addressRepository.save(addressWithCoordinates);
+            return addressRepository.save(address);
         } else {
             Address savedAddress = addressRepository.save(address);
 
-            logger.info("Saved address: {}", savedAddress);
+            logger.debug("Saved address: {}", savedAddress);
 
             return savedAddress;
         }
     }
-
 
     /**
      * Find Address By Id
@@ -67,7 +75,11 @@ public class AddressService {
      * @return Address
      */
     public Address findAddressById(String id) {
+        logger.info("Finding address by id...");
+
         Optional<Address> address = addressRepository.findById(id);
+
+        logger.debug("Address found: {}", address);
 
         return address.orElse(null);
     }
@@ -88,10 +100,8 @@ public class AddressService {
      * @param id - Id of Address
      */
     public void deleteAddress(String id) {
-        addressRepository.deleteById(id);
-    }
+        logger.info("Deleting address by id...");
 
-    private Boolean validateLatitude(Double latitude) {
-        return latitude == null;
+        addressRepository.deleteById(id);
     }
 }

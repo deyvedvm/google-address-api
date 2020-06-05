@@ -1,5 +1,8 @@
 package dev.deyve.googleaddressapi.errors;
 
+/**
+ * Address Not FoundException
+ */
 public class AddressNotFoundException extends RuntimeException {
 
     public AddressNotFoundException(String id) {

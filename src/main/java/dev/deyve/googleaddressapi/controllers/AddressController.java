@@ -33,7 +33,7 @@ public class AddressController {
      */
     @GetMapping
     public ResponseEntity<List<Address>> getAddresses() {
-        List<Address> addressList = addressService.getAddresses();
+        List<Address> addressList = addressService.findAddresses();
 
         return new ResponseEntity<>(addressList, HttpStatus.OK);
     }
