@@ -20,6 +20,7 @@ import java.util.Optional;
 import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddress;
 import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddressMock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -71,12 +72,46 @@ class AddressServiceTest {
 
         Address addressResult = addressService.saveAddress(address);
 
-        verify(addressRepository, times(1)).save(any(Address.class));
+        verify(googleRestService, times(1)).findLocation(any(Address.class));
 
-        verify(addressRepository).save(any(Address.class));
+        verify(addressRepository, times(1)).save(any(Address.class));
 
         assertEquals(addressResult.getId(), addressMock.getId(), "Id is not defined");
         assertEquals(addressResult.getLatitude(), locationMock.lat, "Latitude is not defined");
         assertEquals(addressResult.getLongitude(), locationMock.lng, "Longitude is not defined");
     }
-}
+
+    @Test
+    @DisplayName("Find Address by Id - should find address by id")
+    void shouldFindAddressByIdTest() {
+        Optional<Address> optionalAddressMock = Optional.of(addressMock);
+
+        when(addressRepository.findById(any(String.class))).thenReturn(optionalAddressMock);
+
+        Address addressResult = addressService.findAddressById(addressMock.getId());
+
+        verify(addressRepository, times(1)).findById(any(String.class));
+
+        assertEquals(addressResult, addressMock, "Result is different");
+    }
+
+    @Test
+    @DisplayName("Find Address by Id - should find address by id - return null")
+    void shouldFindAddressByIdAndReturnNullTest() {
+        when(addressRepository.findById(any(String.class))).thenReturn(Optional.empty());
+
+        Address addressResult = addressService.findAddressById(addressMock.getId());
+
+        verify(addressRepository, times(1)).findById(any(String.class));
+
+        assertNull(addressResult, "Result is not null");
+    }
+
+    @Test
+    void updateAddress() {
+    }
+
+    @Test
+    void deleteAddress() {
+    }
+} 

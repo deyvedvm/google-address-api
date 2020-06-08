@@ -87,11 +87,17 @@ public class AddressService {
     /**
      * Update Address
      *
-     * @param address
-     * @return
+     * @param address - Address to be saved
+     * @return Updated Address
      */
     public Address updateAddress(Address address) {
-        return addressRepository.save(address);
+        logger.info("Updating address...");
+
+        Address updatedAddress = addressRepository.save(address);
+
+        logger.debug("Updating address...");
+
+        return updatedAddress;
     }
 
     /**
