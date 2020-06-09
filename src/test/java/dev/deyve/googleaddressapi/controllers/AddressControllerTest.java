@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,9 @@ import java.util.List;
 
 import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddress;
 import static dev.deyve.googleaddressapi.utils.TestUtil.buildAddressMock;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
@@ -90,6 +93,31 @@ class AddressControllerTest {
 
         assertEquals(addressMock, addressResult, "Incorrect Response content");
         assertEquals(HttpStatus.CREATED.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+    }
+
+    @Test
+    @DisplayName("POST Address - try save address with street name null - should throw validation error")
+    void WhenRequestPostAddressWithStreetNameNullTest() throws Exception {
+        try {
+            Address address = buildAddress();
+            address.setStreetName(null);
+
+            MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post(URL)
+                    .content(objectMapper.writeValueAsString(address))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andReturn();
+
+            String expectedMessage = "StreetName not be null";
+
+            String actualMessage = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+            assertTrue(actualMessage.contains(expectedMessage), "Message is different");
+
+            assertEquals(HttpStatus.BAD_REQUEST.value(), result.getResponse().getStatus(), "Incorrect Response Status");
+
+        } catch (MethodArgumentNotValidException e) {
+            assertThat(e).hasCauseExactlyInstanceOf(MethodArgumentNotValidException.class);
+        }
     }
 
     @Test
