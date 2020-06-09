@@ -108,10 +108,17 @@ class AddressServiceTest {
     }
 
     @Test
+    @DisplayName("Update Address by Id - should update address - return address updated")
     void updateAddress() {
     }
 
     @Test
-    void deleteAddress() {
+    @DisplayName("Delete Address by Id - should delete address by id")
+    void shouldDeleteAddressById() {
+        doNothing().when(addressRepository).deleteById(any(String.class));
+
+        addressService.deleteAddress(addressMock.getId());
+
+        verify(addressRepository, times(1)).deleteById(any(String.class));
     }
 } 
