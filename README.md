@@ -7,8 +7,8 @@ Given an address it queries the Google API and returns latitude and longitude.
 - [x] Crud
 - [x] Google Service
 - [x] Dockerfile
-- [x] Unit Tests
-- [ ] Integration Tests
+- [x] Unit Tests - Controller and Service
+- [ ] Profiles
 - [ ] Pagination
 - [ ] Use DTO
 - [ ] Swagger
@@ -45,7 +45,7 @@ Given an address it queries the Google API and returns latitude and longitude.
 │   │                   ├── AddressService.java
 │   │                   └── GoogleRestService.java
 │   └── resources
-│       ├── application.yaml
+│       ├── application.yml
 │       ├── static
 │       └── templates
 └── test
@@ -54,14 +54,16 @@ Given an address it queries the Google API and returns latitude and longitude.
     │       └── deyve
     │           └── googleaddressapi
     │               ├── config
-    │               │   └── MongoDBConfig.java
     │               ├── controllers
-    │               │   ├── AddressControllerIT.java
     │               │   └── AddressControllerTest.java
-    │               └── GoogleAddressApiApplicationTests.java
+    │               ├── GoogleAddressApiApplicationTests.java
+    │               ├── services
+    │               │   └── AddressServiceTest.java
+    │               └── utils
+    │                   └── TestUtil.java
     └── resources
 
-23 directories, 15 files
+25 directories, 15 files
 
 ```
 
