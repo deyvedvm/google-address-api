@@ -62,7 +62,7 @@ class AddressServiceTest {
 
     @Test
     @DisplayName("Save Addresses without location - should save address")
-    void shouldSaveAddressTest() throws InterruptedException, ApiException, CloneNotSupportedException, IOException {
+    void shouldSaveAddressWithoutLocationTest() throws InterruptedException, ApiException, CloneNotSupportedException, IOException {
         Address address = buildAddress();
         LatLng locationMock = new LatLng(-22.8962282, -43.1866427);
 
@@ -79,6 +79,22 @@ class AddressServiceTest {
         assertEquals(addressResult.getId(), addressMock.getId(), "Id is not defined");
         assertEquals(addressResult.getLatitude(), locationMock.lat, "Latitude is not defined");
         assertEquals(addressResult.getLongitude(), locationMock.lng, "Longitude is not defined");
+    }
+
+    @Test
+    @DisplayName("Save Addresses with location - should save address")
+    void shouldSaveAddressWithLocationTest() throws InterruptedException, ApiException, CloneNotSupportedException, IOException {
+        Address address = buildAddress();
+        address.setLatitude(-22.8962282);
+        address.setLongitude(-43.1866427);
+
+        when(addressRepository.save(any(Address.class))).thenReturn(addressMock);
+
+        Address addressResult = addressService.saveAddress(address);
+
+        verify(addressRepository, times(1)).save(any(Address.class));
+
+        assertEquals(addressResult.getId(), addressMock.getId(), "Id is not defined");
     }
 
     @Test
