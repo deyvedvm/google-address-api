@@ -109,7 +109,17 @@ class AddressServiceTest {
 
     @Test
     @DisplayName("Update Address by Id - should update address - return address updated")
-    void updateAddress() {
+    void shouldUpdateAddressById() {
+        Address addressUpdated = addressMock;
+        addressUpdated.setStreetName("Avenida Barão de Tefé");
+
+        when(addressRepository.save(any(Address.class))).thenReturn(addressUpdated);
+
+        Address addressResult = addressService.updateAddress(addressMock);
+
+        verify(addressRepository, times(1)).save(any(Address.class));
+
+        assertEquals(addressResult.getStreetName(), addressUpdated.getStreetName(), "Street name is different");
     }
 
     @Test

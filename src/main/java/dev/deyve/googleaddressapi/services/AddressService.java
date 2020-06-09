@@ -95,7 +95,7 @@ public class AddressService {
 
         Address updatedAddress = addressRepository.save(address);
 
-        logger.debug("Updating address...");
+        logger.debug("Updated address: {}", updatedAddress);
 
         return updatedAddress;
     }
