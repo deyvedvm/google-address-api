@@ -1,11 +1,23 @@
 package dev.deyve.googleaddressapi.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.deyve.googleaddressapi.models.Address;
 import org.bson.types.ObjectId;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 @ActiveProfiles("test")
 public class TestUtil {
+
+    public static Address buildAddressResult(ObjectMapper objectMapper, MvcResult result) throws JsonProcessingException, UnsupportedEncodingException {
+        String contentAsString = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+
+        return objectMapper.readValue(contentAsString, Address.class);
+    }
 
     public static Address buildAddress() {
         return Address.builder()
