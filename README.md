@@ -11,7 +11,7 @@ Given an address it queries the Google API and returns latitude and longitude.
 - [ ] Profiles
 - [ ] Pagination
 - [ ] Use DTO
-- [ ] Swagger
+- [x] Swagger
 - [ ] Mongo Atlas
 - [ ] Travis CI
 - [ ] Deploy Heroku
